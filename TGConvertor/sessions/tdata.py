@@ -9,12 +9,12 @@ from opentele2.td.configs import DcId  # type: ignore
 
 class TDataSession:
     def __init__(
-            self,
-            *,
-            dc_id: int,
-            auth_key: bytes,
-            user_id: int,
-            api: APIData = API.TelegramDesktop,
+        self,
+        *,
+        dc_id: int,
+        auth_key: bytes,
+        user_id: int,
+        api: APIData = API.TelegramDesktop,
     ):
         self.dc_id = dc_id
         self.auth_key = auth_key
