@@ -33,7 +33,7 @@ dependencies = [
 [project.optional-dependencies]
 pyrogram = ["pyrogram"]
 kurigram = ["kurigram"]
-tdata = ["opentele"]
+tdata = ["opentele2>=1.2.1"]
 
 [project.urls]
 Homepage = "https://github.com/nazar220160/TGConvertor"
