@@ -3,8 +3,8 @@ from typing import Union
 
 from ..api import API, APIData
 
-from opentele.td import TDesktop, Account, AuthKeyType, AuthKey # type: ignore
-from opentele.td.configs import DcId # type: ignore
+from opentele2.td import TDesktop, Account, AuthKeyType, AuthKey  # type: ignore
+from opentele2.td.configs import DcId  # type: ignore
 
 
 class TDataSession:
@@ -22,9 +22,9 @@ class TDataSession:
         self.api = api
 
     @classmethod
-    def from_tdata(cls, tdata_folder: Union[Path, str]):        
+    def from_tdata(cls, tdata_folder: Union[Path, str]):
         tdata_folder = Path(tdata_folder)
-        
+
         if not tdata_folder.exists():
             raise FileNotFoundError(tdata_folder)
 
@@ -37,7 +37,7 @@ class TDataSession:
             dc_id=account.MainDcId
         )
 
-    def to_folder(self, path: Union[Path, str]):        
+    def to_folder(self, path: Union[Path, str]):
         path = Path(path)
         path.mkdir(parents=True, exist_ok=True)
 
@@ -54,4 +54,3 @@ class TDataSession:
         client._addSingleAccount(account)
 
         client.SaveTData(path / "tdata")
-        
