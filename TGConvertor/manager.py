@@ -148,16 +148,6 @@ class SessionManager:
 
     @classmethod
     def from_pyrogram_string(cls, string: str, api=API.TelegramDesktop):
-        """
-        Creates a SessionManager instance from a Pyrogram string.
-
-        Args:
-            string (str): Pyrogram session string.
-            api (APIData, optional): API data, default is API.TelegramDesktop.
-
-        Returns:
-            SessionManager: An instance initialized from the Pyrogram string.
-        """
         if PyroSession is None:
             raise ImportError("Must install pyrogram or kurigram to use Pyrogram sessions.")
         session = PyroSession.from_string(string)
@@ -172,109 +162,26 @@ class SessionManager:
         )
 
     @classmethod
-    def from_tdata_folder(cls, folder: Union[Path, str]):
-        """
-        Creates a SessionManager instance from a TData session folder.
-
-        Args:
-            folder (Union[Path, str]): Path to the TData session folder.
-
-        Returns:
-            SessionManager: An instance initialized from the TData session folder.
-        """
-        if not TDataSession:
+    async def from_tdata_folder(cls, folder: Union[Path, str], api=API.TelegramDesktop):
+        if TDataSession is None:
             raise ImportError(
-                "TData support requires opentele package. "
-                "Please install it with: pip install tgconvertor[tdata] or pip install opentele"
+                "TData support requires opentele2 package. "
+                "Please install it with: pip install tgconvertor[tdata] or pip install opentele2"
             )
-        session = TDataSession.from_tdata(folder)
-        return cls(auth_key=session.auth_key, dc_id=session.dc_id, api=session.api)
-
-    async def to_pyrogram_file(self, path: Union[Path, str]):
-        """
-        Saves the current session as a Pyrogram file.
-
-        Args:
-            path (Union[Path, str]): Path to save the Pyrogram file.
-        """
-        await self.pyrogram.to_file(Path(path))
-
-    def to_pyrogram_string(self) -> str:
-        """
-        Converts the current session to a Pyrogram session string.
-
-        Returns:
-            str: Pyrogram session string.
-        """
-        return self.pyrogram.to_string()
-
-    async def to_telethon_file(self, path: Union[Path, str]):
-        """
-        Saves the current session as a Telethon file.
-
-        Args:
-            path (Union[Path, str]): Path to save the Telethon file.
-        """
-        await self.telethon.to_file(Path(path))
-
-    def to_telethon_string(self) -> str:
-        """
-        Converts the current session to a Telethon session string.
-
-        Returns:
-            str: Telethon session string.
-        """
-        return self.telethon.to_string()
-
-    async def to_tdata_folder(self, path: Union[Path, str]):
-        """
-        Saves the current session as a TData session folder.
-
-        Args:
-            path (Union[Path, str]): Path to save the TData session folder.
-        """
-        await self.get_user_id()
-        self.tdata.to_folder(path)
-
-    @property
-    def pyrogram(self) -> PyroSession:
-        """
-        Returns a PyroSession instance representing the current session.
-        """
-
-        if PyroSession is None:
-            raise ImportError("Must install pyrogram or kurigram to use Pyrogram sessions.")
-
-        return PyroSession(
-            dc_id=self.dc_id,
-            auth_key=self.auth_key,
-            user_id=self.user_id,
-            api_id=self.api_id,
-            test_mode=self.test_mode,
-            is_bot=self.is_bot,
+        from .sessions.tdata import TDataSession as _TData
+        session = _TData.from_tdata(folder)
+        return cls(
+            dc_id=session.dc_id,
+            auth_key=session.auth_key,
+            user_id=session.user_id,
+            api=api,
         )
 
-    @property
-    def telethon(self) -> TeleSession:
-        """
-        Returns a TeleSession instance representing the current session.
-        """
-        if TeleSession is None:
-            raise ImportError("Must install telethon to use Telethon sessions.")
-        return TeleSession(
-            dc_id=self.dc_id,
-            auth_key=self.auth_key,
-        )
-
-    @property
-    def tdata(self) -> TDataSession:
-        """
-        Returns a TDataSession instance representing the current session.
-        """
-        if not TDataSession:
+    def tdata(self):
+        if TDataSession is None:
             raise ImportError(
-                "TData support requires opentele package. "
-                "Please install it with: pip install tgconvertor[tdata] or pip install opentele"
+                "TData support requires opentele2 package. "
+                "Please install it with: pip install tgconvertor[tdata] or pip install opentele2"
             )
         if self.user_id is None:
             raise ValueError("user_id is required for TDataSession")
@@ -326,7 +233,7 @@ class SessionManager:
         Validates the current session.
 
         Returns:
-            bool: Validation status (True if valid, False otherwise).
+            bool: Validation status (True if valid, False if not).
         """
         user = await self.get_user()
         self.valid = bool(user)
